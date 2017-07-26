@@ -33,6 +33,10 @@ declare module "react-relay/modern" {
 
     function graphql(strings: TemplateStringsArray): GraphQLTaggedNode
 
+    namespace graphql {
+        var experimental: typeof graphql
+    }
+
     function createFragmentContainer<T>(
         Component: React.ComponentClass<T> | React.StatelessComponent<T>,fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap
     ): React.ComponentClass<T>
