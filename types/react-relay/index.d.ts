@@ -1,10 +1,269 @@
-// Type definitions for react-relay 0.9.2
+// Type definitions for react-relay 1.0.0
 // Project: https://github.com/facebook/relay
 // Definitions by: Johannes Schickling <https://github.com/graphcool>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.1
 
-declare module "react-relay" {
+declare module "react-relay/compat" {
+    import * as modern from "react-relay/modern"
+    export = modern
+}
+
+declare module "react-relay/modern" {
+    import * as React from "react";
+
+    interface QueryRendererProp {
+        cacheConfig?: any,
+        environment: Environment | ClassicEnvironment,
+        query: GraphQLTaggedNode,
+        render: (readyState: ReadyState) => (React.ReactElement<any>) | null,
+        variables: Variables,
+    }
+
+    interface ReadyState {
+        error: any,
+        props: any,
+        retry: any,
+    }
+
+    class QueryRenderer extends React.Component<QueryRendererProp,ReadyState> {}
+
+    export type GraphQLTaggedNode = (() => ConcreteFragment | ConcreteBatch);
+    export interface GeneratedNodeMap {[key: string]: GraphQLTaggedNode}
+
+    function graphql(strings: TemplateStringsArray): GraphQLTaggedNode
+
+    namespace graphql {
+        var experimental: typeof graphql
+    }
+
+    function createFragmentContainer<T>(
+        Component: React.ComponentClass<T> | React.StatelessComponent<T>,fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap
+    ): React.ComponentClass<T>
+
+    function createRefetchContainer<T>(
+        Component: React.ComponentClass<T> | React.StatelessComponent<T>, fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap,
+        taggedNode: GraphQLTaggedNode
+    ): React.ComponentClass<T>
+
+    function createPaginationContainer<T>(
+        ComponentClass: React.ComponentClass<T> | React.StatelessComponent<T>, fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap,
+        connectionConfig: ConnectionConfig
+    ): React.ComponentClass<T>
+
+    function commitMutation<T>(
+        environment: CompatEnvironment,
+        config: MutationConfig
+    ): Disposable
+
+    export type CompatEnvironment = Environment | RelayClassicEnvironment;
+    export type Environment = any // Todo: add proper types
+    export type RelayClassicEnvironment = any // Todo: add proper types
+    export type ClassicEnvironment = any // Todo: add proper types
+
+    export interface MutationConfig {
+        mutation: GraphQLTaggedNode,
+        variables: Variables,
+        onCompleted?: ((response: Object | null) => void) | null,
+        onError?: ((error: Error) => void) | null,
+        optimisticResponse?: (() => Object) | null,
+        optimisticUpdater?: ((store: RecordSourceSelectorProxy) => void) | null,
+        updater?: ((store: RecordSourceSelectorProxy) => void) | null,
+    }
+    export type RecordSourceSelectorProxy = any // Todo: add proper types
+
+    export interface ConnectionConfig {
+        direction?: 'backward' | 'forward',
+        getConnectionFromProps?: (props: any) => ConnectionData | null,
+        getFragmentVariables?: FragmentVariablesGetter,
+        getVariables: (
+            props: any,
+            paginationInfo: {count: number, cursor: string | null},
+            fragmentVariables: Variables,
+        ) => Variables,
+        query: GraphQLTaggedNode,
+    }
+
+    type PageInfo = string
+
+    export interface ConnectionData {
+        edges?: any[] | null,
+        pageInfo?: PageInfo | null,
+    }
+
+    type FragmentVariablesGetter = (
+        prevVars: Variables,
+        totalCount: number,
+    ) => Variables;
+
+    export interface ConcreteFragment {
+        argumentDefinitions: ConcreteArgumentDefinition[],
+        kind: 'Fragment',
+        metadata: {[key: string]: any},
+        name: string,
+        selections: ConcreteSelection[],
+        type: string,
+    }
+
+    export interface ConcreteCondition {
+        kind: 'Condition',
+        passingValue: boolean,
+        condition: string,
+        selections: ConcreteSelection[],
+    }
+
+    export type ConcreteArgument = ConcreteLiteral | ConcreteVariable;
+
+    export interface ConcreteLiteral {
+        kind: 'Literal',
+        name: string,
+        type: string | null,
+        value: any,
+    }
+
+    export interface ConcreteVariable {
+        kind: 'Variable',
+        name: string,
+        type: string | null,
+        variableName: string,
+    }
+
+    export type ConcreteArgumentDefinition =
+    | ConcreteLocalArgument
+    | ConcreteRootArgument;
+
+    export interface ConcreteRootArgument {
+        kind: 'RootArgument',
+        name: string,
+        type: string | null,
+    }
+
+    export interface ConcreteFragmentSpread {
+        args: ConcreteArgument[],
+        kind: 'FragmentSpread',
+        name: string,
+    }
+
+    export type ConcreteField = ConcreteScalarField | ConcreteLinkedField;
+
+    export interface ConcreteScalarField {
+        alias: string | null,
+        args: ConcreteArgument[] | null,
+        kind: 'ScalarField',
+        name: string,
+        storageKey: string | null,
+    }
+
+    export interface ConcreteLinkedField {
+        alias: string | null,
+        args: ConcreteArgument[]| null,
+        concreteType: string | null,
+        kind: 'LinkedField',
+        name: string,
+        plural: boolean,
+        selections: ConcreteSelection[],
+        storageKey: string | null,
+    }
+
+    export type ConcreteHandle = ConcreteScalarHandle | ConcreteLinkedHandle;
+
+    export interface ConcreteScalarHandle {
+        alias: string,
+        args: ConcreteArgument[],
+        kind: 'ScalarHandle',
+        name: string,
+        handle: string,
+        key: string,
+        filters: string[],
+    }
+
+    export interface ConcreteLinkedHandle {
+        alias: string,
+        args: ConcreteArgument[],
+        kind: 'LinkedHandle',
+        name: string,
+        handle: string,
+        key: string,
+        filters: string[],
+    }
+
+    export interface ConcreteInlineFragment {
+        kind: 'InlineFragment',
+        selections: ConcreteSelection[],
+        type: string,
+    }
+
+    export type ConcreteSelection =
+        | ConcreteCondition
+        | ConcreteField
+        | ConcreteFragmentSpread
+        | ConcreteHandle
+        | ConcreteInlineFragment;
+
+    export interface ConcreteLocalArgument {
+        defaultValue: any,
+        kind: 'LocalArgument',
+        name: string,
+        type: string,
+    }
+
+    export interface ConcreteRoot {
+        argumentDefinitions: ConcreteLocalArgument[],
+        kind: 'Root',
+        name: string,
+        operation: 'mutation' | 'query' | 'subscription',
+        selections: ConcreteSelection[],
+    }
+
+    export interface ConcreteBatch {
+        kind: 'Batch',
+        fragment: ConcreteFragment,
+        id: string,
+        metadata: {[key: string]: any},
+        name: string,
+        query: ConcreteRoot,
+        text: string,
+    }
+
+    export interface RefetchOptions {
+        force?: boolean,
+    }
+
+    export type Variables = any;
+    export type Disposable = any;
+
+    interface RelayProp {
+        readonly route: { name: string; }; // incomplete, also has params and queries
+        readonly variables: any;
+        readonly pendingVariables?: any | null;
+    }
+
+    interface RelayRefetchProp extends RelayProp {
+        refetch: (
+            refetchVariables: Variables | ((fragmentVariables: Variables) => Variables),
+            renderVaiables: Variables | null,
+            // The example code has this optional but in the flow type it's not
+            callback?: ((error: Error | null) => void) | null,
+            options?: RefetchOptions,
+        ) => Disposable,
+    }
+
+    interface RelayPaginationProp extends RelayProp {
+        hasMore: () => boolean
+        isLoading: () => boolean
+        loadMore: (
+            pageSize: number,
+            callback: (error: Error | null) => void,
+            options?: RefetchOptions,
+        ) => Disposable | null,
+        refetchConnection: (
+            totalCount: number,
+            callback: (error: Error | null) => void,
+        ) => Disposable | null,
+    }
+}
+
+declare module "react-relay/classic" {
     import * as React from "react";
 
     type ClientMutationID = string;
@@ -136,18 +395,16 @@ declare module "react-relay" {
         'STORE_FOUND_ALL' |
         'STORE_FOUND_REQUIRED';
 
-    interface OnReadyStateChange {
-        (readyState: {
+    type OnReadyStateChange = (readyState: {
               ready: boolean,
               done: boolean,
               stale: boolean,
               error?: Error,
-              events: Array<ReadyStateEvent>,
+              events: ReadyStateEvent[],
               aborted: boolean
-        }): void
-    }
+        }) => void
 
-    interface RelayProp {
+    export interface RelayProp {
         readonly route: { name: string; }; // incomplete, also has params and queries
         readonly variables: any;
         readonly pendingVariables?: any | null;
